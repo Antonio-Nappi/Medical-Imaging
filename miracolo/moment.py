@@ -29,7 +29,7 @@ def thresh_callback(val):
     # Get the moments
     mu = [None]*len(contours)
     for i in range(len(contours)):
-        if((cv.arcLength(contours[i], True)) > 12):            
+        if((cv.arcLength(contours[i], True)) > soglia):            
             mu[i] = cv.moments(contours[i])
             
             
@@ -39,9 +39,10 @@ def thresh_callback(val):
     
     for i in range(len(contours)):
         # add 1e-5 to avoid division by zero
-        print("Lungh ", cv.arcLength(contours[i], True))
         if((cv.arcLength(contours[i], True)) > soglia):            
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))
+            print("Lungh %.2f, mass number %.2f " % (cv.arcLength(contours[i], True),i))
+
     # Draw contours
     
     #Questo crea un'altra immagine con solo le parti evidenziate, buono per fare la maschera
@@ -70,7 +71,7 @@ def thresh_callback(val):
         if((cv.arcLength(contours[i], True)) > soglia):            
             print(' * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f' % (i, mu[i]['m00'], cv.contourArea(contours[i]), cv.arcLength(contours[i], True)))
 
-source="esempio3.tif"
+source="esempio2.tif"
 src = cv.imread(source)
 src = cv.resize(src,(400,500))
 
