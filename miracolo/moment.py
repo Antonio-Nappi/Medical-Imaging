@@ -16,6 +16,7 @@ def nothing(x):
     pass
     
 def thresh_callback(val):
+    print("Val", val)
     threshold = val
     soglia=cv.getTrackbarPos('Soglia', source_window)
    
@@ -42,6 +43,10 @@ def thresh_callback(val):
         if((cv.arcLength(contours[i], True)) > soglia):            
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))
             print("Lungh %.2f, mass number %.2f " % (cv.arcLength(contours[i], True),i))
+            #Se trovo regioni molto lunghe aumento il thresh di 3
+            if( cv.arcLength(contours[i], True) > 800):
+                cv.setTrackbarPos('Thresh',source_window,val+3)
+                thresh_callback(val+3)
 
     # Draw contours
     
@@ -86,7 +91,7 @@ cv.namedWindow(source_window)
 cv.imshow(source_window, src)
 max_thresh = 255
 thresh = 100 # initial threshold
-cv.createTrackbar('Thresh:', source_window, thresh, max_thresh, thresh_callback)
+cv.createTrackbar('Thresh', source_window, thresh, max_thresh, thresh_callback)
 #cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, nothing)
 cv.createTrackbar('Soglia', source_window, thresh, 1000, nothing)
 
