@@ -17,7 +17,7 @@ def aPriori(image, count):
     _, contours, _ = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     for i in range(len(contours)):
-        print("Finding countours in image n." + str(count) + " , Contours n." + str(i+1)+ " Ground_images = "+ str(count-1))
+        print("Finding countours in image n." + str(count) + " , Contours n." + str(i+1))
         #L'if è stato utilizzato per evitare i pixel isolati o piccolissime regioni di pixel che non fanno parte della massa
         if(cv.contourArea(contours[i])>50 and cv.arcLength(contours[i], True)> 40):
             list_area.append(cv.contourArea(contours[i]))
@@ -32,24 +32,11 @@ def aPriori(image, count):
 ground_path = "dataset\groundtruth"
 ground_images = os.listdir("dataset\groundtruth")
 
-
 list_areas = []
 list_perimeters = []
 sum_area_tot = 0
 sum_perimeter_tot = 0
 
-'''
-img = cv.imread("dataset\groundtruth\\20588046_024ee3569b2605dc_MG_R_ML_ANON.tif", cv.IMREAD_GRAYSCALE)
-if img is None:
-        print('Could not open or find the image:', img)
-        exit(0)
-
-list_area_tot,list_lung_tot=aPriori(img,num)
-
-
-print("AREA", list_area_tot)
-
-'''
 count = 1
 for ground in ground_images:
     img = cv.imread(ground_path + "\\" + ground, cv.IMREAD_GRAYSCALE)
@@ -94,5 +81,4 @@ Valore Massimo per l'Area :  751132.0
 Valore Minimo per la Lunghezza :  216.46803629398346
 Valore Medio per la Lunghezza :  1303.7378783071863
 Valore Massimo per la Lunghezza :  3855.347655892372
-
 '''
