@@ -60,8 +60,8 @@ min_perimeter = min(list_perimeters)
 max_area = max(list_areas)
 max_perimeter = max(list_perimeters)
    
-for i in range(len(list_area_tot)):
-  print(' * Area[%d] = %.2f, Lung[%d] = %.2f' % (i, list_area_tot[i],i, list_lung_tot[i]))
+for i in range(len(list_areas)):
+  print(' * Area[%d] = %.2f, Lung[%d] = %.2f' % (i, list_areas[i],i, list_perimeters[i]))
 
 print("Minimum Area: ", min_area)
 print("Average Area: ", average_area)
