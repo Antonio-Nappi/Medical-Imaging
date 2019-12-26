@@ -8,7 +8,6 @@ mask_path = "dataset\masks"
 mass_images = os.listdir(mass_path)
 mask_images = os.listdir(mask_path)
 
-list = []
 
 for entry in mask_images:
     # Find rectangles
@@ -19,7 +18,9 @@ for entry in mask_images:
     x, y, width, height = cv.boundingRect(contours[0])
 
     # Cropping images
-    img_mass = cv.imread(mass_path + "\\" + entry[:-4] + ".tif", cv.IMREAD_GRAYSCALE)
+    print(mass_path + "\\" + entry[:-9] + ".tif")
+    img_mass = cv.imread(mass_path + "\\" + entry[:-9] + ".tif", cv.IMREAD_GRAYSCALE)
+    print(img_mass)
     image = Image.fromarray(img_mass)
     cropped = image.crop(x, y, x+width, y+height)
     cropped.save("dataset\images\cropped\\" + entry)
