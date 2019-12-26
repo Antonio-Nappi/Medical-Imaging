@@ -35,6 +35,7 @@ def thresh_callback(val):
     print("Val", val)
     threshold = val
     soglia=cv.getTrackbarPos('Soglia', source_window)
+    soglia=soglia*50
    
     
 
@@ -53,10 +54,16 @@ def thresh_callback(val):
     
     
     _, contours, _ = cv.findContours(thres, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    
+    
+  
+    
+    #I valori soglia sono stati presi dallo script 'aPriori'
+    
     # Get the moments
     mu = [None]*len(contours)
     for i in range(len(contours)):
-        if((cv.contourArea(contours[i])) > soglia*50):            
+        if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000 ):            
             mu[i] = cv.moments(contours[i])
             
             
@@ -66,7 +73,7 @@ def thresh_callback(val):
     
     for i in range(len(contours)):
         # add 1e-5 to avoid division by zero
-        if((cv.contourArea(contours[i])) > soglia*50):            
+        if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))
             print("Lungh %.2f, mass number %.2f " % (cv.arcLength(contours[i], True),i))
             '''
@@ -85,13 +92,13 @@ def thresh_callback(val):
     #altrimenti aggiungiavamo sempre più drawing
     src2=src.copy()
     for i in range(len(contours)):
-        if((cv.contourArea(contours[i])) > soglia*50):            
+        if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
             cv.drawContours(src2, contours, i, color, 2)
             cv.circle(src2, (int(mc[i][0]), int(mc[i][1])), 20, color, -1)
             
     for i in range(len(contours)):
-        if((cv.contourArea(contours[i])) > soglia*50):            
+        if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
             cv.drawContours(drawing, contours, i, color, 2)
     
@@ -106,10 +113,10 @@ def thresh_callback(val):
     
     # Calculate the area with the moments 00 and compare with the result of the OpenCV function
     for i in range(len(contours)):
-        if((cv.contourArea(contours[i])) > soglia*50):            
+        if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             print(' * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f' % (i, mu[i]['m00'], cv.contourArea(contours[i]), cv.arcLength(contours[i], True)))
 
-source="mass/mass (4).tif"
+source="20588334_493155e17143edef_MG_L_CC_ANON.tif"
 src = cv.imread(source)
 
 if src is None:
