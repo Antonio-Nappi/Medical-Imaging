@@ -32,33 +32,24 @@ def normalize_and_HE(img):
     return t
     
 def thresh_callback(val):
-    print("Val", val)
     threshold = val
     soglia=cv.getTrackbarPos('Soglia', source_window)
     soglia=soglia*50
    
-    
-
-
+    #   Threshold
     ret,thres = cv.threshold(src_gray,threshold,255,0)
     
-        #Opening
+    #   Opening
 
     kernel = np.ones((5,5),np.uint8)
     thres = cv.morphologyEx(thres, cv.MORPH_ELLIPSE, kernel)
-
     
-    
-    #canny_val=cv.getTrackbarPos('Canny Thresh', source_window)
-    #canny_output = cv.Canny(src_gray, canny_val, canny_val * 2)
-    
-    
+    #   Contours
     _, contours, _ = cv.findContours(thres, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     
     
-  
-    
     #I valori soglia sono stati presi dallo script 'aPriori'
+    
     
     # Get the moments
     mu = [None]*len(contours)
@@ -75,16 +66,9 @@ def thresh_callback(val):
         # add 1e-5 to avoid division by zero
         if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))
-            print("Lungh %.2f, mass number %.2f " % (cv.arcLength(contours[i], True),i))
-            '''
-            #Se trovo regioni molto lunghe aumento il thresh di 3
-            if( cv.arcLength(contours[i], True) > 800):
-                cv.setTrackbarPos('Thresh',source_window,val+3)
-                thresh_callback(val+3)
-            '''
-
+            
+            
     # Draw contours
-    
     #Questo crea un'altra immagine con solo le parti evidenziate, buono per fare la maschera
     drawing = np.zeros((thres.shape[0], thres.shape[1], 3), dtype=np.uint8)
     
@@ -116,14 +100,18 @@ def thresh_callback(val):
         if(cv.contourArea(contours[i]) > 2500 and cv.contourArea(contours[i])< 100000):            
             print(' * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f' % (i, mu[i]['m00'], cv.contourArea(contours[i]), cv.arcLength(contours[i], True)))
 
+
+
+
+
+
+
 source="20588334_493155e17143edef_MG_L_CC_ANON.tif"
 src = cv.imread(source)
 
 if src is None:
     print('Could not open or find the image:', source)
     exit(0)
-#src = cv.resize(src,(400,500))
-
 source_window = 'Source'
 
 cv.namedWindow(source_window)
@@ -132,7 +120,6 @@ cv.imshow(source_window, src2)
 max_thresh = 255
 thresh = 100 # initial threshold
 cv.createTrackbar('Thresh', source_window, thresh, max_thresh, thresh_callback)
-#cv.createTrackbar('Canny Thresh:', source_window, thresh, max_thresh, nothing)
 cv.createTrackbar('Soglia', source_window, thresh, 1000, nothing)
 
 
@@ -160,12 +147,7 @@ e = normalize(img6)
     
     
 src=img5.copy()
-# Convert image to gray and blur it
 
-'''
-src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-src_gray = cv.blur(src_gray, (3,3))
-'''
 
 thresh_callback(thresh)
 cv.waitKey()
