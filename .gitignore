@@ -54,3 +54,4 @@ dkms.conf
 *.iml
 *.tif
 *.png
+*.db
