@@ -52,3 +52,5 @@ Mkfile.old
 dkms.conf
 *.xml
 *.iml
+*.tif
+*.png
