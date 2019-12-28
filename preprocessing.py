@@ -1,8 +1,10 @@
-import numpy as np
-import math
 import cv2 as cv
+import numpy as np
+import random as rng
+from PIL import  Image
+import math
+import os
 import copy
-from PIL import Image
 
 def nothing(immmagine):
     pass
@@ -38,19 +40,24 @@ def preprocess(src_gray):
 
     return img5
 
-def preprocessing(test_path,predicted_mass):
-    i = 1
-    for mass in predicted_mass:
-        img = cv.imread(test_path + mass, cv.IMREAD_GRAYSCALE)
-        print("Processing image n." + str(i) + " ...")
-        prep = preprocess(img)
-        pil_img = Image.fromarray(prep) #convert to PIL Image
-        print("Saving image n." + str(i) + " ...")
-        cv.imwrite("dataset\enhanced\\" + mass, prep)
-        pil_img.save("dataset\enhanced\\" + mass)
-        i +=1
+############################
 
-'''img = cv.imread("dataset\images\mass\\24055355_1e10aef17c9fe149_MG_L_CC_ANON.tif", cv.IMREAD_GRAYSCALE)
+mass_path = "dataset\\test\\"
+mass_images = os.listdir(mass_path)
+
+i = 1
+for mass in mass_images:
+    img = cv.imread(mass_path + mass, cv.IMREAD_GRAYSCALE)
+    print("Processing image n." + str(i) + " ...")
+    prep = preprocess(img)
+    pil_img = Image.fromarray(prep) #convert to PIL Image
+    print("Saving image n." + str(i) + " ...")
+    pil_img.save("dataset\enhanced\\" + mass)
+    i +=1
+
+
+'''
+img = cv.imread("dataset\images\mass\\24055355_1e10aef17c9fe149_MG_L_CC_ANON.tif", cv.IMREAD_GRAYSCALE)
 prepr_img = preprocess(img)
 pixels = cv.countNonZero(prepr_img)
 tmp = copy.deepcopy(prepr_img)
@@ -59,9 +66,6 @@ print("Min value di PREP: %8.55f" %(np.amin(prepr_img)))
 print("Average value di PREP: %8.55f" %(np.average(prepr_img)))
 print("Pixel not zero: ", pixels)
 
-#scalar_img = 0.23+tmp
-#print("Max value di SCA: %8.17f" %(np.amax(scalar_img)))
-#print("Min value di SCA: %8.17f" %(np.amin(scalar_img)))
 
 cv.namedWindow("th")
 cv.createTrackbar("TH", "th", 100, 600, nothing)

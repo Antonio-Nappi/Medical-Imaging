@@ -2,7 +2,7 @@ import os
 from PIL import Image
 import cv2 as cv
 import shutil
-#####################################__UTILS__#######################################
+
 # data augmentation
 def mirroring(mass_path, overlay_images, ground_images):
     n_mass = 1

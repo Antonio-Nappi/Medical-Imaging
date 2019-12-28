@@ -4,12 +4,15 @@ import mahotas as mt
 import sklearn.svm as skl
 from sklearn.metrics import accuracy_score
 from utils import dataset_preprocessing as dsp
-from utils import utils as ut
+from utils import utilities as ut
 
 
 class SVM_Classifier:
 
     def __init__(self,nomass_path,mass_path, overlay_path, mask_path,ground_path):
+        # Create the classifier
+        print("--------- [STATUS] Creating the classifier ---------")
+        self._my_svm = skl.SVC(C=100000, kernel='rbf', gamma='auto', verbose=True, max_iter=-1)
         self._nomass_images = os.listdir(nomass_path)
         self._mass_images = os.listdir(mass_path)
         # load the overlay dataset
@@ -21,7 +24,6 @@ class SVM_Classifier:
         # empty list to hold feature vectors and train labels
         self._train_features = []
         self._train_labels = []
-        self._svm
 
     def _texture_features(self,image):
         # calculate haralick texture features for 4 types of adjacency
@@ -57,7 +59,7 @@ class SVM_Classifier:
             dsp.createTestSet(mass_path, nomass_path, test_path)
 
     def extract_features(self):
-        print ("--------- [STATUS]: Started extracting haralick textures... ---------")
+        print ("--------- [STATUS]: Started extracting haralick textures ---------")
         count_training = 1
         if not ut.check_file():
             for mass in self._mass_images:
@@ -84,12 +86,9 @@ class SVM_Classifier:
             self._train_features,self._train_labels = ut.load()
 
     def train_classifier(self):
-        # Create the classifier
-        print("--------- [STATUS] Creating the classifier... ---------")
-        self._svm = skl.SVC(C=100000, kernel='rbf', gamma='auto', verbose=True, max_iter=-1)
         # Fit the training data and labels
-        print ("--------- [STATUS]: Fitting data/label to model... ---------")
-        self._svm.fit(self._train_features, self._train_labels)
+        print ("--------- [STATUS]: Fitting data ---------")
+        self._my_svm.fit(self._train_features, self._train_labels)
 
 
     def prediction(self,test_path,tot_test_images=105,num_mass_test=45):
@@ -110,7 +109,7 @@ class SVM_Classifier:
             features = self._texture_features(gray)
 
             # evaluate the model and predict label
-            prediction = int(self._svm.predict(features.reshape(1, -1))[0])
+            prediction = int(self._my_svm.predict(features.reshape(1, -1))[0])
             if prediction:
                 predicted_mass.append(test)
             print("------------------------------")
