@@ -1,56 +1,30 @@
+'''
+La nostra idea è quella di mettere in cascata un classificatore SVM (addestrato con le feature estratta da haralick) con
+un processo (semiautomatico per adesso è quello che da i risultati migliori, se la unet funzionasse useremmo questa) in grado
+di effettuare la segmentazione dell'immagine(mediante l'estrazione dei bordi) per determinati criteri. L'immagine viene
+prima di essere segmentata, elaborata con una serie di trasformazioni suggerite dal paper che ci ha passato il prof.
+'''
+
+from utils import data_preprocessing
 import cv2 as cv
-import numpy as np
-import os
-import shutil
-from PIL import Image
-import mahotas as mt
-import math
-from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
-import utils
+from SVM_Classifier import SVM_Classifier
+nomass_path=""
+mass_path=""
+overlay_path=""
+test_path=""
+mask_path=""
+ground_path=""
 
-nomass_path = "dataset\images\\nomass"
-nomass_images = os.listdir(nomass_path)
-mass_path = "dataset\images\mass"
+#Creato il classificatore ed ottenuta la cartella contenente solo le masse
+classifier = SVM_Classifier(nomass_path,mass_path, overlay_path, mask_path,ground_path)
+classifier.labelling(mass_path,nomass_path,test_path)
+classifier.extract_features()
+classifier.train_classifier()
+predicted_mass=classifier.prediction(test_path)
+#Fatto l'enhancement di tutte le immagini predette come masse
+data_preprocessing(test_path,predicted_mass)
+#a_min=input("Insert the minimum area that the mass should have(press -1 to use the precalculated area):")
 
-# load the overlay dataset
-overlay_path = "dataset\overlay"
-overlay_images = os.listdir(overlay_path)
 
-# load the mask dataset
-mask_path = "dataset\masks"
-mask_images = os.listdir(mask_path)
 
-labelling = False #set True if you want to create class labels
-if(labelling):
-    utils.clearing(mask_images, nomass_images)
-    utils.createClasses(nomass_path, nomass_images, overlay_images, mass_path)
-    utils.mirroring(mass_path)
 
-# load the training dataset
-mass_images = os.listdir(mass_path)
-images = [None]*30
-out=[]
-
-for i in range(30):
-    print(mass_images[i])
-    string = mass_path+'\\'+mass_images[i]
-    images[i] = cv.imread(string,cv.IMREAD_GRAYSCALE)
-
-k = 0
-for img in images:
-    tmp1 = np.zeros((img.shape[0],img.shape[1]),np.uint8)
-    tmp2 = np.zeros((img.shape[0], img.shape[1]), np.uint8)
-    low_bound = np.percentile(img,5)
-    up_bound = np.percentile(img,95)
-    max = np.amax(img)
-    min = np.amin(img)
-    print("Immagine numero {}".format(k))
-    k += 1
-    for i in range(img.shape[0]):
-        for j in range(img.shape[1]):
-            tmp1[i,j] = (img[i,j]) * ((up_bound - low_bound)/(max - min)) + low_bound
-            tmp2[i, j] =255-(255 / math.log(928, 10)) * math.log(10 + 9 * tmp1[i, j], 10)
-    tmp2=cv.resize(tmp2,(700,700))
-    cv.imshow("Test_Image", tmp2)
-    cv.waitKey(0)
