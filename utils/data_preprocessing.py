@@ -20,7 +20,7 @@ def normalize_and_HE(img):
     t = cv.equalizeHist(np.asarray(normalize(img),dtype=np.uint8))
     return t
 
-def preprocess(src_gray):
+def enhancing_structures(src_gray):
     zeroToOne_img = normalize(src_gray)
 
     clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -43,10 +43,10 @@ def preprocessing(test_path,predicted_mass):
     for mass in predicted_mass:
         img = cv.imread(test_path + mass, cv.IMREAD_GRAYSCALE)
         print("Processing image n." + str(i) + " ...")
-        prep = preprocess(img)
-        pil_img = Image.fromarray(prep) #convert to PIL Image
+        prep_img = enhancing_structures(img)
+        pil_img = Image.fromarray(prep_img) #convert to PIL Image
         print("Saving image n." + str(i) + " ...")
-        cv.imwrite("dataset\enhanced\\" + mass, prep)
+        cv.imwrite("dataset\enhanced\\" + mass, prep_img)
         pil_img.save("dataset\enhanced\\" + mass)
         i +=1
 
