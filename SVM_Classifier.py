@@ -19,7 +19,7 @@ class SVM_Classifier:
         self._ground_path = ground_path
         self._test_path = test_path
         #Inizialization of the SVM classifier
-        self._my_svm = skl.SVC(C=1000000.0, kernel='rbf', gamma='auto', verbose=True, max_iter=-1)
+        self._my_svm = skl.SVC(C=1000000000, kernel='rbf', gamma='auto', verbose=True, max_iter=-1)
         self._nomass_images = os.listdir(nomass_path)
         # load the overlay dataset
         self._overlay_images = os.listdir(overlay_path)
@@ -46,10 +46,10 @@ class SVM_Classifier:
                 predicted_nomass +=1
             else:
                 predicted_mass +=1
-        print("Number of masses: 30")
+        print("Number of masses: 45")
         print("Number of predicted masses: ", predicted_mass)
         print("---------------------------------------")
-        print("Number of non-masses: 30")
+        print("Number of non-masses: 60")
         print("Number of predicted non-masses: ", predicted_nomass)
         print("---------------------------------------")
         print("SVM ACCURACY: ", accuracy_score(y_true, y_pred))
@@ -94,7 +94,7 @@ class SVM_Classifier:
         print ("--------- [STATUS]: Fitting data ---------")
         self._my_svm.fit(self._train_features, self._train_labels)
 
-    def prediction(self,tot_test_images=60,num_mass_test=30):
+    def prediction(self,tot_test_images=105,num_mass_test=45):
         # load the test set
         test_images = os.listdir(self._test_path)
 

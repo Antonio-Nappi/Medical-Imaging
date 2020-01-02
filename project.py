@@ -20,7 +20,7 @@ test_path = "dataset\\test"
 mask_path = "dataset\masks"
 ground_path = "dataset\groundtruth"
 
-# STEP 1:   We extract the features from the training set in order to fit the SVM classifier. This step ends with a list of
+# STEP 1:   Extracting the features from the training set in order to fit the SVM classifier. This step ends with a list of
 #           predicted masses (it is also shown the accuracy of the classifier).
 classifier = SVM_Classifier(nomass_path, mass_path, overlay_path, mask_path, ground_path, test_path)
 classifier.labelling()
@@ -29,9 +29,10 @@ classifier.train_classifier()
 predicted_mass = classifier.prediction()
 
 #STEP 2:    Pre-processing of the images to enhance internal structures, before to give them to the Neural Net.
-#data_preprocessing.preprocessing(test_path, predicted_mass)
+preprocessed_test_masses = data_preprocessing.preprocessing(test_path, predicted_mass)
 
-#STEP 3:
+#STEP 3:    Loading the U-Net model and predicting masses on test set
+
 
 
 

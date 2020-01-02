@@ -40,15 +40,18 @@ def enhancing_structures(src_gray):
 
 def preprocessing(test_path,predicted_mass):
     i = 1
+    enhanced_mass = []
     for mass in predicted_mass:
         img = cv.imread(test_path + mass, cv.IMREAD_GRAYSCALE)
         print("Processing image n." + str(i) + " ...")
         prep_img = enhancing_structures(img)
+        enhanced_mass.append(prep_img)
         pil_img = Image.fromarray(prep_img) #convert to PIL Image
         print("Saving image n." + str(i) + " ...")
         cv.imwrite("dataset\enhanced\\" + mass, prep_img)
         pil_img.save("dataset\enhanced\\" + mass)
         i +=1
+    return enhanced_mass
 
 '''img = cv.imread("dataset\images\mass\\24055355_1e10aef17c9fe149_MG_L_CC_ANON.tif", cv.IMREAD_GRAYSCALE)
 prepr_img = preprocess(img)
