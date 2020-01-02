@@ -52,16 +52,9 @@ def preprocessing(test_path,predicted_mass):
 
 '''img = cv.imread("dataset\images\mass\\24055355_1e10aef17c9fe149_MG_L_CC_ANON.tif", cv.IMREAD_GRAYSCALE)
 prepr_img = preprocess(img)
-pixels = cv.countNonZero(prepr_img)
 tmp = copy.deepcopy(prepr_img)
 print("Max value di PREP: %8.55f" %(np.amax(prepr_img)))
 print("Min value di PREP: %8.55f" %(np.amin(prepr_img)))
-print("Average value di PREP: %8.55f" %(np.average(prepr_img)))
-print("Pixel not zero: ", pixels)
-
-#scalar_img = 0.23+tmp
-#print("Max value di SCA: %8.17f" %(np.amax(scalar_img)))
-#print("Min value di SCA: %8.17f" %(np.amin(scalar_img)))
 
 cv.namedWindow("th")
 cv.createTrackbar("TH", "th", 100, 600, nothing)
@@ -70,16 +63,12 @@ while(1): #0-NERO   1-BIANCO #0.3981747604413089458
     prefix = 0.0001747604413089458
     th = (cv.getTrackbarPos("TH", "th"))+100
     val = (th/1000)+prefix
-    print("val: %8.55f" %(val))
     ret, th_img = cv.threshold(tmp, val, 1, cv.THRESH_BINARY)
-    pix2= cv.countNonZero(th_img)
 
     #_____________ STAMPE ________ #
     print("-------------------------------")
     print("Max value di th: %8.55f" %(np.amax(th_img)))
     print("Min value di th: %8.55f" %(np.amin(th_img)))
-    print("Pixel not zero: ", pix2)
-    print("-------------------------------")
     #_______________________________#
 
     cv.imshow("th", np.hstack((cv.resize(prepr_img, (600,500)), cv.resize(th_img, (600,500)))))

@@ -1,33 +1,37 @@
 '''
-La nostra idea è quella di mettere in cascata un classificatore SVM (addestrato con le feature estratta da haralick) con
-un processo (semiautomatico per adesso è quello che da i risultati migliori, se la unet funzionasse useremmo questa) in grado
-di effettuare la segmentazione dell'immagine(mediante l'estrazione dei bordi) per determinati criteri. L'immagine viene
-prima di essere segmentata, elaborata con una serie di trasformazioni suggerite dal paper che ci ha passato il prof.
+Our pipeline is based on the following main steps:
+    - First: an SVM classifier is trained thanks to the haralick texture features extracted from the dataset.
+            The dataset was first balanced and then agumented in order to well fit the classifier. So, it is divided in
+            2 parts: n.582 mass images; n.586 no-mass images.
+    - Second: Output images of the classifier are preprocessed in order to enphasize internal structures such as masses.
+    - Third: U-Net Neural Network, whose input is the predicted output of the SVM classifier that was pre-processed in
+            the previous step. The images are then analyzed in order to extract masses.
+    - Fourth: Image Segmentation.
 '''
 
 from utils import data_preprocessing
 from SVM_Classifier import SVM_Classifier
 import cv2 as cv
 
-nomass_path = "dataset\images\\nomass\\"
-mass_path = "dataset\images\\mass\\"
-overlay_path = "dataset\overlay\\"
-test_path = "dataset\\test\\"
-mask_path = "dataset\masks\\"
-ground_path = "dataset\groundtruth\\"
+nomass_path = "dataset\images\\nomass"
+mass_path = "dataset\images\\mass"
+overlay_path = "dataset\overlay"
+test_path = "dataset\\test"
+mask_path = "dataset\masks"
+ground_path = "dataset\groundtruth"
 
-#Creato il classificatore ed ottenuta la cartella contenente solo le masse
-classifier = SVM_Classifier(nomass_path,mass_path, overlay_path, mask_path,ground_path)
-classifier.labelling(mass_path,nomass_path,test_path)
+# STEP 1:   We extract the features from the training set in order to fit the SVM classifier. This step ends with a list of
+#           predicted masses (it is also shown the accuracy of the classifier).
+classifier = SVM_Classifier(nomass_path, mass_path, overlay_path, mask_path, ground_path, test_path)
+classifier.labelling()
 classifier.extract_features()
 classifier.train_classifier()
-predicted_mass = classifier.prediction(test_path)
+predicted_mass = classifier.prediction()
 
-#Fatto l'enhancement di tutte le immagini predette come masse
-data_preprocessing.preprocessing(test_path, predicted_mass)
-#a_min=input("Insert the minimum area that the mass should have(press -1 to use the precalculated area):")
+#STEP 2:    Pre-processing of the images to enhance internal structures, before to give them to the Neural Net.
+#data_preprocessing.preprocessing(test_path, predicted_mass)
 
-#Elaborazione delle immagini
+#STEP 3:
 
 
 
