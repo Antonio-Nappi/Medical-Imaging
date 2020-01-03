@@ -4,54 +4,21 @@ Created on Thu Dec 19 14:17:50 2019
 
 @author: AntonioBho
 """
-
-from __future__ import print_function
-from __future__ import division
 import cv2 as cv
 import numpy as np
 import random as rng
-import math
 import os
 import time
+import copy
 rng.seed(time.time())
 
 def nothing(x):
     pass
-
-def normalize(img):
-    tmp = img-np.amin(img)
-    image = tmp/np.amax(img)
-    return image
-
-def regional_mean(img,list):
-    tmp = cv.blur(img,(list[0],list[1]))
-    return cv.resize(tmp, (img.shape[0],img.shape[1]),interpolation=cv.INTER_LINEAR)
-
-def normalize_and_HE(img):
-    t = cv.equalizeHist(np.asarray(normalize(img),dtype=np.uint8))
-    return t
-
-def preprocessing(src_gray):
-    img2 = normalize(src_gray)
-    clahe = cv.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))
-    img_clahe = clahe.apply(src_gray)
-    mu = np.average(src_gray)
-    tmp = normalize(img_clahe)
-    img3 = np.zeros((tmp.shape[0],tmp.shape[1]))
-    for i in range(img_clahe.shape[0]):
-        for j in range(img_clahe.shape[1]):
-            img3[i,j]= tmp[i,j] * (1-math.exp(-(img2[i,j]/mu)))
-    img3 = normalize(img3)
-    m2 = regional_mean(img3,[16,16])
-    img4 = normalize_and_HE(img3)
-    img5 = normalize(img3 + regional_mean(m2,[16,16]))
-    return img5,img4
-    
+'''
 def thresh_callback(val):
     threshold = val
     
-    soglia_max=750000
-    soglia_min=2500
+
    
     #   Threshold
     ret,thres = cv.threshold(src_gray,threshold,255,0)
@@ -120,35 +87,61 @@ def thresh_callback(val):
             print(' * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f' % (i, mu[i]['m00'], cv.contourArea(contours[i]), cv.arcLength(contours[i], True)))
 
 mass_path = "dataset\images\mass"
+'''
+
+
+#def find_countours(mass_path,Amax=750000,Amin=2500):
+mass_path = "dataset\enhanced\\"
 mass_images = os.listdir(mass_path)
 
 for mass in mass_images:
+    print(mass_path+mass)
+    src = cv.imread(mass_path + mass,cv.IMREAD_ANYDEPTH)
+    print(np.unique(src))
+    hist, bin=np.histogram(src)
+    print(bin)
+    cv.namedWindow("th")
+    width,height=src.shapex
+    tmp = copy.deepcopy(src)
+    hist = cv.calcHist([src],[0],None,[0. ,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ],[0.,1.])
+    #primo tentativo val:  9.231093e-16
+    # primo tentativo val:  9.595606e-16
+    # primo tentativo val:  9.725499e-16
+    # primo tentativo val:  1.0173351e-15
+    # primo tentativo val:  1.1688327e-15
+    # primo tentativo val:  0.038179856
+    # primo tentativo val:  0.048218753
+    # primo tentativo val:  0.059720024
+    # primo tentativo val:  0.06377587
+    # primo tentativo val:  0.06511031
+    # primo tentativo val:   0.06548106
+    # primo tentativo val:  0.065624475
+    # primo tentativo val:  0.06567243
+    cv.createTrackbar("TH", "th", 100, 600, nothing)
+
+    while (1):  # 0-NERO   1-BIANCO #0.3981747604413089458
+        prefix = 0.0001747604413089458
+        th = (cv.getTrackbarPos("TH", "th")) + 100
+        val = (th / 1000) + prefix
+        print("val: %8.55f" % (val))
+        ret, th_img = cv.threshold(src, 0.6567243, 1, cv.THRESH_BINARY)
+        pix2 = cv.countNonZero(th_img)
+        cv.imshow("th", np.hstack((cv.resize(src, (600, 500)), cv.resize(th_img, (600, 500)))))
+        cv.imshow("histogram",hist)
+        key = cv.waitKey(1)
+        if key == 27:
+            break
+    '''max_thresh = 255
+    thresh = 100 # initial threshold
+    cv.createTrackbar('Thresh', source_window, thresh, max_thresh, thresh_callback)
     
-        name=mass
-        # read the training image
-        src = cv.imread("dataset\images\mass\\" + mass, cv.IMREAD_COLOR)
-
-#source="esempio.tif"
-#src = cv.imread(source)
-        
-        if src is None:
-            print('Could not open or find the image:', src)
-            exit(0)
-        source_window = 'Source'
-        
-        cv.namedWindow(source_window)
-        src2 = cv.resize(src,(400,500))
-        cv.imshow(source_window, src2)
-        max_thresh = 255
-        thresh = 100 # initial threshold
-        cv.createTrackbar('Thresh', source_window, thresh, max_thresh, thresh_callback)
-        
-        src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-        
-        img5, img4= nappi(src_gray)
-
-        img6 = normalize_and_HE(img5) * img4
-        e = normalize(img6)
-        src=img5.copy()
-        thresh_callback(thresh)
-        cv.waitKey()
+    src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+    
+    img5, img4= nappi(src_gray)
+    
+    img6 = normalize_and_HE(img5) * img4
+    e = normalize(img6)
+    src=img5.copy()
+    thresh_callback(thresh)
+    cv.waitKey()
+    '''

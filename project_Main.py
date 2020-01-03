@@ -12,6 +12,7 @@ Our pipeline is based on the following main steps:
 from utils import data_preprocessing
 from SVM_Classifier import SVM_Classifier
 import cv2 as cv
+from keras.models import load_model
 
 nomass_path = "dataset\images\\nomass"
 mass_path = "dataset\images\\mass"
@@ -32,7 +33,8 @@ predicted_mass = classifier.prediction()
 preprocessed_test_masses = data_preprocessing.preprocessing(test_path, predicted_mass)
 
 #STEP 3:    Loading the U-Net model and predicting masses on test set
-
+model=load_model("Model.h5")
+####bisogna adesso fare la predict sul test set, estrarre la massa da dentro la tetta (creando la maschera dall'originale facendo il threshold e fancendo l'and) infine misurare le performance della soluzione proposta.
 
 
 
