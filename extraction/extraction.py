@@ -1,0 +1,137 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jan  4 18:45:57 2020
+
+@author: AntonioBho
+"""
+
+
+from __future__ import print_function
+from __future__ import division
+import cv2 as cv
+import numpy as np
+import random as rng
+import os
+
+def control(contours):
+    #Dati ricavati dal file aPriori
+    soglia_max_area=45060
+    soglia_min_area=160
+    soglia_min_lung=50
+    soglia_max_lung=1074
+    return cv.contourArea(contours) > soglia_min_area and cv.contourArea(contours)< soglia_max_area and cv.arcLength(contours, True) > soglia_min_lung and cv.arcLength(contours, True)< soglia_max_lung
+        
+
+def thresh_callback(val):
+            threshold = val
+            
+            
+           
+            #   Threshold
+            ret,thres = cv.threshold(src,threshold,255,0,cv.THRESH_BINARY+cv.THRESH_OTSU)
+            
+            #   Opening
+        
+            kernel = np.ones((5,5),np.uint8)
+            thres = cv.morphologyEx(thres, cv.MORPH_ELLIPSE, kernel)
+            
+            #   Contours
+            _, contours, _ = cv.findContours(thres, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        
+            #I valori soglia sono stati presi dallo script 'aPriori'
+        
+            # Get the moments
+            mu = [None]*len(contours)
+            for i in range(len(contours)):
+                if(control(contours[i])):            
+                    mu[i] = cv.moments(contours[i])
+        
+            # Get the mass centers
+            
+            mc = [None]*len(contours)
+            
+            for i in range(len(contours)):
+                # add 1e-5 to avoid division by zero
+                if(control(contours[i])):            
+                    mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))
+                        
+                        #print(' * MC[%d] =' % (i) )
+                        #print(mc[i])
+                    
+            # Draw contours
+            #Questo crea un'altra immagine con solo le parti evidenziate, buono per fare la maschera
+            drawing = np.zeros((thres.shape[0], thres.shape[1], 3), dtype=np.uint8)
+            
+            #Mi copio l'immagine originale in modo tale da salvarmi l'originale,
+            #altrimenti aggiungiavamo sempre più drawing
+            src2=src.copy()
+            for i in range(len(contours)):
+                if(control(contours[i])):            
+                    color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
+                    cv.drawContours(src2, contours, i, color, 2)
+                    cv.circle(src2, (int(mc[i][0]), int(mc[i][1])), 5, color, -1)
+                    
+            for i in range(len(contours)):
+                if(control(contours[i])):            
+                    color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
+                    cv.drawContours(drawing, contours, i, color, 2)
+        
+            # Visualizzazione
+            cv.imshow('Mask', drawing)
+        
+            font= cv.FONT_HERSHEY_COMPLEX
+            src2 = cv.putText(src2, name, (0,10), font,0.5, (250,0,255))
+        
+            cv.imshow(source_window, src2)
+            cv.imshow('Thres', thres)
+        
+            # Calculate the area with the moments 00 and compare with the result of the OpenCV function
+            for i in range(len(contours)):
+                if(control(contours[i])):            
+                    print(' * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f' % (i, mu[i]['m00'], cv.contourArea(contours[i]), cv.arcLength(contours[i], True)))
+                    
+        
+data = np.loadtxt("predictions.txt",dtype = np.float64)
+print(data.shape) #Dallo shape faccio diviso 512 e capisco quante immagini ho, e ottengo 45 sub_array
+lista=np.split(data,45)
+
+#Per ottenere il nome dell'immagine
+test_path="test_enhanced"
+test_images= os.listdir(test_path)
+
+
+#for i in range(len(lista)):
+i=0
+for test in test_images:
+        name=test
+        print(test_path+"\\"+test)
+        mask=cv.imread(test_path+"\\"+test,cv.IMREAD_ANYDEPTH)
+        if mask is None:
+            print('Could not open or find the image:', mask)
+        mask=cv.resize(mask,(512,512)) 
+        '''
+        #Ho notato che i valori bassi sono della 10^-15
+        print("Max value di PREP: %8.55f" %(np.amax(mask)))
+        print("Min value di PREP: %8.55f" %(np.amin(mask)))
+        '''
+        src = lista[i]
+        src=src*255
+        #♥Converto per il findContours che richiede solo file di uint8 o al massimo 32
+        src = src.astype('uint8')
+        print(src)
+        
+        src[mask<0.00000000000001]=0
+        cv.imshow("After Mask",src)
+        
+        
+        source_window = 'Source'
+        
+        cv.namedWindow(source_window)
+        cv.imshow(source_window, src)
+        max_thresh = 255
+        thresh = 122 # initial threshold
+        cv.createTrackbar('Thresh', source_window, thresh, max_thresh, thresh_callback)
+        
+        thresh_callback(thresh)
+        cv.waitKey()
+        i+=1
