@@ -123,7 +123,6 @@ test_path="test_enhanced"
 test_images= os.listdir(test_path)
 
 
-#for i in range(len(lista)):
 i=0
 for test in test_images:
         name=test
@@ -143,9 +142,13 @@ for test in test_images:
         
         
         src = lista[i]
+        
         src=src*255
         #♥Converto per il findContours che richiede solo file di uint8 o al massimo 32
         src = src.astype('uint8')
+        #Salvo l'immagine
+        cv.imwrite("OutputUnet\\" + name, src)
+
         #Applico la maschera
         src[mask==0]=0        
                 
