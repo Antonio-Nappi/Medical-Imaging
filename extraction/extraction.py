@@ -34,26 +34,16 @@ def control2(contours):
 def thresh_callback(val):
             threshold = val
             print(threshold)
-            
-            
-           
             #   Threshold
             ret,thres = cv.threshold(src,threshold,255,0,cv.THRESH_BINARY+cv.THRESH_OTSU)
-            
-           
             #   Opening
-        
             kernel = np.ones((5,5),np.uint8)
             thres = cv.morphologyEx(thres, cv.MORPH_ELLIPSE, kernel)
-            
             #   Contours
             _, contours, _ = cv.findContours(thres, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        
             #I valori soglia sono stati presi dallo script 'aPriori'
-        
             #Se non trovo masse abbasso il valore di threshold a 105
             if not control2(contours):
-            
                 thresh_callback(105)
             else:
                     # Get the moments
@@ -87,24 +77,16 @@ def thresh_callback(val):
                             cv.drawContours(src2, contours, i, color, 2)
                             # Il punto da prendere è localizzato da -> (int(mc[i][0]), int(mc[i][1]))
                             cv.circle(src2, (int(mc[i][0]), int(mc[i][1])), 5, color, -1)
-                           
-        
-                            
                     for i in range(len(contours)):
                         if(control(contours[i])):            
                             color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
                             cv.drawContours(drawing, contours, i, color, 2)
-                        
-        
                     # Visualizzazione
                     cv.imshow('Mask', drawing)
-                
                     font= cv.FONT_HERSHEY_COMPLEX
                     src2 = cv.putText(src2, name, (0,10), font,0.5, (250,0,255))
-                
                     cv.imshow(source_window, src2)
                     cv.imshow('Thres', thres)
-                
                     # Calculate the area with the moments 00 and compare with the result of the OpenCV function
                     for i in range(len(contours)):
                         if(control(contours[i])):            
