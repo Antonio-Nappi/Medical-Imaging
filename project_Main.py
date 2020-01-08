@@ -13,6 +13,7 @@ from utils import data_preprocessing
 from SVM_Classifier import SVM_Classifier
 import cv2 as cv
 from keras.models import load_model
+#import extraction
 
 nomass_path = "dataset\images\\nomass"
 mass_path = "dataset\images\\mass"
@@ -28,15 +29,12 @@ classifier.labelling()
 classifier.extract_features()
 classifier.train_classifier()
 predicted_mass = classifier.prediction()
-
+print(len(predicted_mass))
 #STEP 2:    Pre-processing of the images to enhance internal structures, before to give them to the Neural Net.
 preprocessed_test_masses = data_preprocessing.preprocessing(test_path, predicted_mass)
-
+print(len(preprocessed_test_masses))
 #STEP 3:    Loading the U-Net model and predicting masses on test set
 model=load_model("Model.h5")
-####bisogna adesso fare la predict sul test set, estrarre la massa da dentro la tetta (creando la maschera dall'originale facendo il threshold e fancendo l'and) infine misurare le performance della soluzione proposta.
 
-
-
-
-
+predictions=model.predict(preprocessed_test_masses)
+print(len(predictions))

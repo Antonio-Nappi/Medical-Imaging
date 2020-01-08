@@ -57,3 +57,5 @@ dkms.conf
 *.db
 *.pyc
 *.h5
+*.pyc
+*.pyc
