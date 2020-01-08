@@ -12,15 +12,12 @@ import cv2 as cv
 import numpy as np
 import random as rng
 import os
+from utils import aPriori
 
-def control(contours):
+def control(contours,ground_path):
     #Dati ricavati dal file aPriori
-    soglia_max_area=45060
-    soglia_min_area=160
-    soglia_min_lung=50
-    soglia_max_lung=1074
-    return cv.contourArea(contours) > soglia_min_area and cv.contourArea(contours)< soglia_max_area and cv.arcLength(contours, True) > soglia_min_lung and cv.arcLength(contours, True)< soglia_max_lung
-        
+    min_area,average_area,max_area,min_perimeter,average_perimeter,max_perimeter=aPriori.extract_information(ground_path)
+    return cv.contourArea(contours) > min_area and cv.contourArea(contours)< max_area and cv.arcLength(contours, True) > min_perimeter and cv.arcLength(contours, True)< max_perimeter
 
 def control2(contours):
     #Se non trova nessun contorno restituisce false
@@ -31,7 +28,7 @@ def control2(contours):
             #se la funzione control restituisce true vuol dire che almeno un contorno va bene quindi restituisco true
             if(control(contours[i])):
                 return True
-        #Se alla fine del ciclo nessun contorno vabbene allora restituisce False       
+        #Se alla fine del ciclo nessun contorno va bene allora restituisce False
         return False
 
 def thresh_callback(val):
