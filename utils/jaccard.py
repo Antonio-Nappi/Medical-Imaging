@@ -38,23 +38,12 @@ for i in range(len(pred_dir)):
         true_img=cv.resize(true_img,(512,512)) 
 
         pred_img=cv.imread(pred_path+"\\"+pred,cv.IMREAD_ANYDEPTH)
-        
-        #img_true=np.array(true_img).ravel()
-        #img_pred=np.array(pred_img).ravel()
-        
-        
+       
         img_true = np.asarray(true_img).astype(np.bool)
         img_pred = np.asarray(pred_img).astype(np.bool)
-       # iou = jaccard_similarity_score(img_true, img_pred)
         
-        print(type(img_true)) 
-        print(img_true)
-        #cv.imshow("IMG_TRUE",img_true)
-        #cv.imshow("IMG_PRED",img_pred)
-       # print("Jaccard n "+str(i),iou)
+        
         jaccard=jaccard_similarity(img_true,img_pred)
-        #jaccard=jaccard_score(img_true,img_pred,None,1, average='weighted')
-        print("Jaccard Score n "+str(i),jaccard)
         somma=somma+jaccard
 
 media=somma/(i+1)
