@@ -2,11 +2,11 @@ import os
 import numpy as np
 import cv2 as cv
 
-############################################################################################
+#######################################INNER FUNCTIONS #######################################
 
-def _find_information(image, count):
+def __find_information(image, count):
     list_area = []
-    list_lung = []
+    list_perimeter = []
     sum_area = 0
     sum_perimeter = 0
 
@@ -17,15 +17,16 @@ def _find_information(image, count):
         # Ignore isolated pixels or points that do not belong to the masses
         if (cv.contourArea(contours[i]) > 50 and cv.arcLength(contours[i], True) > 40):
             list_area.append(cv.contourArea(contours[i]))
-            list_lung.append(cv.arcLength(contours[i], True))
+            list_perimeter.append(cv.arcLength(contours[i], True))
             sum_area += cv.contourArea(contours[i])
             sum_perimeter += cv.arcLength(contours[i], True)
 
-    return list_area, list_lung, sum_area, sum_perimeter
+    return list_area, list_perimeter, sum_area, sum_perimeter
 
 ############################################################################################
 
 def extract_information(ground_path):
+    # A priori information about masses from the groundtruth of the whole dataset.
     ground_images = os.listdir(ground_path)
     list_areas = []
     list_perimeters = []
@@ -35,12 +36,10 @@ def extract_information(ground_path):
     count = 1
     for ground in ground_images:
         img = cv.imread(ground_path + "\\" + ground, cv.IMREAD_GRAYSCALE)
-        if img is None:
-            print('Could not open or find the image:', img)
-            exit(0)
-        area, perimeter, sum_Area, sum_Lung = _find_information(img, count)
+        img = cv.resize(img, (512, 512))
+        area, perimeter, sum_Area, sum_perimeter = __find_information(img, count)
         sum_area_tot += sum_Area
-        sum_perimeter_tot += sum_Lung
+        sum_perimeter_tot += sum_perimeter
 
         list_areas.extend(area)
         list_perimeters.extend(perimeter)

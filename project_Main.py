@@ -1,6 +1,7 @@
 from utils import data_preprocessing
 from predictions.SVM_Classifier import SVM_Classifier
 from predictions import UNet
+from extraction import draw_masses
 import os
 import cv2 as cv
 import numpy as np
@@ -28,8 +29,12 @@ predicted_mass = data_preprocessing.cropping(mask_path, predicted_mass, path_pre
 
 #STEP 3:    Loading the U-Net model and predicting masses of test set
 predictions = UNet.unet_predict(predicted_mass)
-
 print("lunghezza: ", len(predictions))
 print(predictions[0])
 
 #STEP 4:    Segmentation process and final output
+segmented_images = draw_masses.clean_unet_images(predicted_mass, predictions)
+outcomes, groud_images = draw_masses.my_draw_contours(segmented_images)
+
+#STEP 5:    Evaluating performance
+
