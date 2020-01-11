@@ -1,7 +1,9 @@
 from utils import data_preprocessing
+from utils.jaccard import jaccard_function
 from predictions.SVM_Classifier import SVM_Classifier
 from predictions import UNet
 from extraction import draw_masses
+
 import os
 import cv2 as cv
 import numpy as np
@@ -34,7 +36,9 @@ print(predictions[0])
 
 #STEP 4:    Segmentation process and final output
 segmented_images = draw_masses.clean_unet_images(predicted_mass, predictions)
-outcomes, groud_images = draw_masses.my_draw_contours(segmented_images)
+outcomes, ground_images = draw_masses.my_draw_contours(segmented_images)
+
 
 #STEP 5:    Evaluating performance
 
+jaccard_list,media=jaccard_function(ground_images,path_predicted_mass)
