@@ -1,26 +1,18 @@
-'''
-Our pipeline is based on the following main steps:
-    - First: an SVM classifier is trained thanks to the haralick texture features extracted from the dataset.
-            The dataset was first balanced and then agumented in order to well fit the classifier. So, it is divided in
-            2 parts: n.582 mass images; n.586 no-mass images.
-    - Second: Output images of the classifier are preprocessed in order to enphasize internal structures such as masses.
-    - Third: U-Net Neural Network, whose input is the predicted output of the SVM classifier that was pre-processed in
-            the previous step. The images are then analyzed in order to extract masses.
-    - Fourth: Image Segmentation.
-'''
-
 from utils import data_preprocessing
-from SVM_Classifier import SVM_Classifier
+from predictions.SVM_Classifier import SVM_Classifier
+from predictions import UNet
+import os
 import cv2 as cv
-from keras.models import load_model
-#import extraction
+import numpy as np
 
+############################ PATH DEFINITION ############################
 nomass_path = "dataset\images\\nomass"
 mass_path = "dataset\images\\mass"
 overlay_path = "dataset\overlay"
 test_path = "dataset\\test"
 mask_path = "dataset\masks"
 ground_path = "dataset\groundtruth"
+################################   END   ################################
 
 # STEP 1:   Extracting the features from the training set in order to fit the SVM classifier. This step ends with a list of
 #           predicted masses (it is also shown the accuracy of the classifier).
@@ -28,13 +20,16 @@ classifier = SVM_Classifier(nomass_path, mass_path, overlay_path, mask_path, gro
 classifier.labelling()
 classifier.extract_features()
 classifier.train_classifier()
-predicted_mass = classifier.prediction()
-print(len(predicted_mass))
-#STEP 2:    Pre-processing of the images to enhance internal structures, before to give them to the Neural Net.
-preprocessed_test_masses = data_preprocessing.preprocessing(test_path, predicted_mass)
-print(len(preprocessed_test_masses))
-#STEP 3:    Loading the U-Net model and predicting masses on test set
-model=load_model("Model.h5")
+predicted_mass, path_predicted_mass = classifier.prediction()
 
-predictions=model.predict(preprocessed_test_masses)
-print(len(predictions))
+#STEP 2:    Pre-processing of the images to enhance internal structures, before to give them to the Neural Net.
+predicted_mass = data_preprocessing.preprocessing(predicted_mass)
+predicted_mass = data_preprocessing.cropping(mask_path, predicted_mass, path_predicted_mass)
+
+#STEP 3:    Loading the U-Net model and predicting masses of test set
+predictions = UNet.unet_predict(predicted_mass)
+
+print("lunghezza: ", len(predictions))
+print(predictions[0])
+
+#STEP 4:    Segmentation process and final output

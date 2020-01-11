@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan  9 15:03:13 2020
-Jaccard
-"""
-
 import cv2 as cv
 import numpy as np
 import os

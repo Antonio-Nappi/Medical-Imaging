@@ -11,7 +11,7 @@ class SVM_Classifier:
 
     def __init__(self, nomass_path, mass_path, overlay_path, mask_path, ground_path, test_path):
         # Create the classifier
-        print("--------- [STATUS] Creating the classifier ---------")
+        print("-------------------- [STATUS] Creating the classifier ----------------")
         self._nomass_path = nomass_path
         self._mass_path = mass_path
         self._overlay_path = overlay_path
@@ -30,6 +30,7 @@ class SVM_Classifier:
         # empty list to hold feature vectors and train labels
         self._train_features = []
         self._train_labels = []
+        print("-------------------- [NOTIFY] Classifier created ---------------------")
 
     def _texture_features(self,image):
         # calculate haralick texture features for 4 types of adjacency
@@ -39,6 +40,7 @@ class SVM_Classifier:
         return ht_mean
 
     def _evaluate_prediction(self,y_pred, y_true):
+        print("===========================================")
         predicted_mass = 0
         predicted_nomass = 0
         for y in y_pred:
@@ -48,11 +50,12 @@ class SVM_Classifier:
                 predicted_mass +=1
         print("Number of masses: 45")
         print("Number of predicted masses: ", predicted_mass)
-        print("---------------------------------------")
+        print("===========================================")
         print("Number of non-masses: 60")
         print("Number of predicted non-masses: ", predicted_nomass)
-        print("---------------------------------------")
+        print("===========================================")
         print("SVM ACCURACY: ", accuracy_score(y_true, y_pred))
+        print("===========================================")
 
     def labelling(self, labelling=False):
         if(labelling):
@@ -63,9 +66,9 @@ class SVM_Classifier:
 
     def extract_features(self):
         mass_images = os.listdir(self._mass_path)
-        print ("--------- [STATUS]: Started extracting haralick textures ---------")
         count_training = 1
-        if not ut.check_file():
+        if not ut.check_file(): #check if the features have been already extracted
+            print("-------------------- [STATUS] Extracting Haralick textures -----------")
             for mass in mass_images:
                 # read the training image
                 image = cv.imread(self._mass_path + "\\" + mass, cv.IMREAD_GRAYSCALE)
@@ -85,16 +88,20 @@ class SVM_Classifier:
                 self._train_features.append(features)
                 print("Extracting features from image number " + str(count_training))
                 count_training += 1
+            print("-------------------- [NOTIFY] Features extracted ---------------------")
             ut.store(self._train_features,self._train_labels)
         else:
+            print("-------------------- [STATUS] Loading features and labels ------------")
             self._train_features,self._train_labels = ut.load()
 
     def train_classifier(self):
         # Fit the training data and labels
-        print ("--------- [STATUS]: Fitting data ---------")
+        print ("-------------------- [STATUS] Fitting the model ----------------------")
         self._my_svm.fit(self._train_features, self._train_labels)
+        print("-------------------- [NOTIFY] Model fitted ---------------------------")
 
     def prediction(self,tot_test_images=105,num_mass_test=45):
+        print("-------------------- [STATUS] Classifier prediction ------------------")
         # load the test set
         test_images = os.listdir(self._test_path)
 
@@ -103,6 +110,7 @@ class SVM_Classifier:
         y_pred = []
         y_true = []
         predicted_mass = []
+        path_predicted_mass = []
         for test in test_images:
             image = cv.imread(self._test_path + "\\" + test)
             # convert to grayscale
@@ -114,7 +122,8 @@ class SVM_Classifier:
             # evaluate the model and predict label
             prediction = int(self._my_svm.predict(features.reshape(1, -1))[0])
             if prediction:
-                predicted_mass.append(test)
+                predicted_mass.append(image)
+                path_predicted_mass.append(test)
             print("------------------------------")
             # 0 means noMass, while 1 means mass
             print("Prediction of image n. ", str(count_test), ": ", prediction)
@@ -130,4 +139,4 @@ class SVM_Classifier:
                 y_true.append(int(0))
 
         self._evaluate_prediction(y_pred, y_true)
-        return predicted_mass
+        return predicted_mass, path_predicted_mass

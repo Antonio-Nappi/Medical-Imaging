@@ -1,23 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jan  4 18:45:57 2020
-
-@author: AntonioBho
-"""
-
-
 from __future__ import print_function
 from __future__ import division
 import cv2 as cv
 import numpy as np
 import random as rng
 import os
-from utils import aPriori
+from utils.utilities import extract_information
 
 
 def control(contours,ground_path):
     #Dati ricavati dal file aPriori
-    min_area,average_area,max_area,min_perimeter,average_perimeter,max_perimeter=aPriori.extract_information(ground_path)
+    min_area, average_area, max_area, min_perimeter, average_perimeter, max_perimeter = extract_information(ground_path)
     return cv.contourArea(contours) > min_area and cv.contourArea(contours)< max_area and cv.arcLength(contours, True) > min_perimeter and cv.arcLength(contours, True)< max_perimeter
 
 def control2(contours):
