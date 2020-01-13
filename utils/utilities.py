@@ -10,7 +10,7 @@ def __find_information(image, count):
     sum_area = 0
     sum_perimeter = 0
 
-    _, contours, _ = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     for i in range(len(contours)):
         print("Finding countours in image n." + str(count) + " , Contours n." + str(i + 1))

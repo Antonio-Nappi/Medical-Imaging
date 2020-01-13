@@ -36,4 +36,8 @@ SVM ACCURACY:  0.8571428571428571
 ---------------------------------------------------------------
 False-positives: 0 - all the masses are well classified
 False-negatives: 15 - images with no mass that have been classified as mass
----------------------------------------------------------------
+
+
+__________________________________ U-NET PREDICTION__________________________________
+Test loss: 0.7297657
+Test accuracy: 0.8267117
