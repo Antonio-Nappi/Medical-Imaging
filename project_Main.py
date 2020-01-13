@@ -1,12 +1,8 @@
 from utils import data_preprocessing
-from utils.jaccard import jaccard_function
+from utils.jaccard import jaccard
 from predictions.SVM_Classifier import SVM_Classifier
 from predictions import UNet
 from extraction import draw_masses
-
-import os
-import cv2 as cv
-import numpy as np
 
 ############################ PATH DEFINITION ############################
 nomass_path = "dataset\images\\nomass"
@@ -14,7 +10,7 @@ mass_path = "dataset\images\\mass"
 overlay_path = "dataset\overlay"
 test_path = "dataset\\test"
 mask_path = "dataset\masks"
-ground_path = "dataset\groundtruth"
+ground_path = "dataset\groundtruth\groundtruth"
 ################################   END   ################################
 
 # STEP 1:   Extracting the features from the training set in order to fit the SVM classifier. This step ends with a list of
@@ -38,7 +34,5 @@ print(predictions[0])
 segmented_images = draw_masses.clean_unet_images(predicted_mass, predictions)
 outcomes, ground_images = draw_masses.my_draw_contours(segmented_images)
 
-
 #STEP 5:    Evaluating performance
-
-jaccard_list,media=jaccard_function(ground_images,path_predicted_mass)
+jaccard_list, media = jaccard(ground_images, path_predicted_mass)

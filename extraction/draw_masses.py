@@ -9,7 +9,7 @@ ground_path = "dataset\groundtruth"
 min_area, average_area, max_area, min_perimeter, average_perimeter, max_perimeter = extract_information(ground_path)
 ################################################################
 
-###################################### INNER FUNCTIOS ######################################
+###################################### INNER FUNCTIONS ######################################
 def __check_masses(contours):
     new_contours = []
     if len(contours) < 1:
@@ -34,6 +34,7 @@ def __set_threshold(threshold_image, thr_value):
 #############################################################################################
 
 def my_draw_contours(segmeted_images):
+    print("-------------------- [STATUS] Drawing contours -----------------------")
     ground_images = []
     outcomes = []
     for img in segmeted_images:
@@ -54,10 +55,11 @@ def my_draw_contours(segmeted_images):
             cv.drawContours(drawing, contours, i, (255, 255, 255), -1)  # -1 = FILLED
         outcomes.append(img)
         ground_images.append(drawing)
-
+    print("-------------------- [NOTIFY] All images have been processed ---------")
     return  outcomes, ground_images
 
 def clean_unet_images(input_unet_images, output_unet_images):
+    print("-------------------- [STATUS] Processing U-Net output ----------------")
     #input_unet_images have been used to compute the mask of the image
     mask_images = []
     for mask in input_unet_images:
@@ -71,11 +73,10 @@ def clean_unet_images(input_unet_images, output_unet_images):
     segmeted_images = []
     i=0
     for mass in output_unet_images:
-        true_path = build_true_path(mass)
         mass = mass * 255
         mass = mass.astype('uint8')
         mass[mask_images[i] == 0] = 0
         segmeted_images.append(mass)
         i+=1
-
+    print("-------------------- [NOTIFY] Outputs processed ----------------------")
     return segmeted_images
