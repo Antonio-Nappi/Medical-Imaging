@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import random as rng
-from utils.data_preprocessing import build_true_path
+#from utils.data_preprocessing import build_true_path
 from utils.utilities import extract_information
 
 ###################### GLOBAL INFORMATION ######################
