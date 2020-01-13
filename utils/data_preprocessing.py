@@ -9,13 +9,9 @@ def __normalize(img):
     image = tmp/np.amax(img)
     return image
 
-def __regional_mean(img,list):
-    tmp = cv.blur(img,(list[0],list[1]))
-    return cv.resize(tmp, (img.shape[0],img.shape[1]),interpolation=cv.INTER_LINEAR)
-
-def __normalize_and_HE(img):
-    t = cv.equalizeHist(np.asarray(__normalize(img),dtype=np.uint8))
-    return t
+def __regional_mean(img, k_size):
+    blurred_img = cv.blur(img,(k_size[0],k_size[1]))
+    return cv.resize(blurred_img, (img.shape[0], img.shape[1]), interpolation=cv.INTER_LINEAR)
 
 def __enhancing_structures(src_gray):
     zeroToOne_img = __normalize(src_gray)
@@ -30,8 +26,8 @@ def __enhancing_structures(src_gray):
         for j in range(img_clahe.shape[1]):
             img3[i, j] = tmp[i, j] * (1 - math.exp(-(zeroToOne_img[i, j] / mu)))
     img3 = __normalize(img3)
-    m2 = __regional_mean(img3, [16, 16])
-    img5 = __normalize(img3 + __regional_mean(m2, [16, 16]))
+    blur_img = __regional_mean(img3, [16, 16])
+    img5 = __normalize(img3 + __regional_mean(blur_img, [16, 16]))
 
     return img5
 ##########################################################################################
