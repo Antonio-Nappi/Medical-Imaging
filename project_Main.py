@@ -2,7 +2,7 @@ from utils import data_preprocessing
 from utils.jaccard import jaccard
 from predictions.SVM_Classifier import SVM_Classifier
 from predictions import UNet
-from extraction import draw_masses
+from draw_mass import draw_masses
 
 ############################ PATH DEFINITION ############################
 nomass_path = "dataset\images\\nomass"
