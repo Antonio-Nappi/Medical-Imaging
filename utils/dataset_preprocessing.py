@@ -20,20 +20,16 @@ def balancing(mass_path):
 # data augmentation
 def augmentation(mass_path, nomass_path, nomass_images):
     mass_images = os.listdir(mass_path)
-    n_mass = 1
-    n_nomass = 1
-    for image in mass_images:
-        print("Rotating mass image n.", n_mass)
-        img = Image.open(mass_path + "\\" + image)
-        rotated = img.rotate(315, expand=True)
-        rotated.save(mass_path + "\\" + "rot315_" + image)
-        n_mass += 1
-    for image in nomass_images:
-        print("Flipping nomass image n.", n_nomass)
-        img = Image.open(nomass_path + "\\" + image)
-        rotated = img.rotate(315, expand=True)
-        rotated.save(nomass_path + "\\" + "rot315_" + image)
-        n_nomass += 1
+    count = 1
+    for mass, nomass in zip(mass_images, nomass_images):
+        print("Rotating images n.", count)
+        img1 = Image.open(mass_path + "\\" + mass)
+        img2 = Image.open(mass_path + "\\" + nomass)
+        rotated1 = img1.rotate(315, expand=True)
+        rotated2 = img2.rotate(315, expand=True)
+        rotated1.save(mass_path + "\\" + "rot315_" + mass)
+        rotated2.save(mass_path + "\\" + "rot315_" + nomass)
+        count += 1
 
 # create labelled classes
 def createClasses(source_path, all_images, overlay_images, dest_path):

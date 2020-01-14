@@ -3,7 +3,11 @@ import math
 import cv2 as cv
 from PIL import Image
 
-##########################################################################################
+#################################### INNER FUNCTIONS ########################################
+'''
+Implementation of the code proposed in: 'Digital Mammographic Computer Aided Diagnosis (CAD)
+using Adaptive Level Set Segmentation' from John E.Ball and Lori Mann Bruce
+'''
 def __normalize(img):
     tmp = img-np.amin(img)
     image = tmp/np.amax(img)
@@ -33,6 +37,12 @@ def __enhancing_structures(src_gray):
 ##########################################################################################
 
 def preprocessing(predicted_mass):
+    '''
+    The function preprocesses all the mammogram images predicted as masses by the SVM classifier
+    by using the Adaptive Level Set Segmentation (ALSS). The aim is to enhance internal structures.
+    :param predicted_mass: the list of mammogram images predicted as masses.
+    :return: the list of enhanced mammogram images.
+    '''
     print("--------- [STATUS] Preprocessing images ---------")
     i = 1
     enhanced_mass = []
@@ -57,6 +67,15 @@ def build_true_path(path):
 ##########################################################################################
 
 def cropping(mask_path, mass_images, path_predicted_mass):
+    '''
+    Since our CNN (U-Net) works with cropped images, in order to remove background and avoid
+    to learn useless details, the function crops all the predicted images in order to give them
+    to the U-Net.
+    :param mask_path: the list of masks from which the bounding boxes have been extracted.
+    :param mass_images: the list of mammogram images to crop.
+    :param path_predicted_mass: the list of paths of the mass_images list.
+    :return: the list of cropped images.
+    '''
     print("-------------------- [STATUS] Cropping images for U-Net --------------")
     cropped_images = []
     i = 0

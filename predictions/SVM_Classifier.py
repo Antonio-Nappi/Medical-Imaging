@@ -33,6 +33,11 @@ class SVM_Classifier:
         print("-------------------- [NOTIFY] Classifier created ---------------------")
 
     def _texture_features(self,image):
+        '''
+        The function extract the Haralick texture features from the current image.
+        :param image: the image on which Haralick is computed.
+        :return: a list of features of the current image.
+        '''
         # calculate haralick texture features for 4 types of adjacency
         textures = mt.features.haralick(image)
         # take the mean of it and return it
@@ -40,6 +45,12 @@ class SVM_Classifier:
         return ht_mean
 
     def _evaluate_prediction(self,y_pred, y_true):
+        '''
+        The function evaluates the performance of the SVM classifier.
+        :param y_pred: the list of labels predicted from the SVM classifier.
+        :param y_true: the list of true labels associated to the Test Set.
+        :return: the accuracy of the SVM classifier.
+        '''
         print("===========================================")
         predicted_mass = 0
         predicted_nomass = 0
@@ -58,6 +69,10 @@ class SVM_Classifier:
         print("===========================================")
 
     def labelling(self, labelling=False):
+        '''
+        The function checks if the dataset preprocessing has been executed.
+        :param labelling: the boolean condition: if True the data preprocessing must be executed.
+        '''
         if(labelling):
             dsp.cleaning(self._mask_path, self._mask_images, self._nomass_path, self._nomass_images)
             dsp.createClasses(self._nomass_path, self._nomass_images, self._overlay_images, self._mass_path)
@@ -65,6 +80,10 @@ class SVM_Classifier:
             dsp.augmentation(self._mass_path, self._nomass_path, self._nomass_images)
 
     def extract_features(self):
+        '''
+        The function extracts all the features from the images in the Training Set and creates
+        the respective labels for each image. It also saves the files with features and labels.
+        '''
         mass_images = os.listdir(self._mass_path)
         count_training = 1
         if not ut.check_file(): #check if the features have been already extracted
@@ -95,12 +114,25 @@ class SVM_Classifier:
             self._train_features,self._train_labels = ut.load()
 
     def train_classifier(self):
+        '''
+        The function calls the fit function of the SVM classifier.
+        '''
         # Fit the training data and labels
         print ("-------------------- [STATUS] Fitting the model ----------------------")
         self._my_svm.fit(self._train_features, self._train_labels)
         print("-------------------- [NOTIFY] Model fitted ---------------------------")
 
-    def prediction(self,tot_test_images=105,num_mass_test=45):
+    def prediction(self, tot_test_images=105, num_mass_test=45):
+        '''
+        The function extract the features from each mammogram image in the Test Set and calls
+        the predict function of the SVM classifier. It also creates a list with the predicted
+        labels.
+        :param tot_test_images: the total number of images in the Test Set. 105 is the default
+        value based on our Test Set.
+        :param num_mass_test: the total number of mammogram images with masses. 45 is the
+        default value based on our Test Set.
+        :return: a tuple of lists: the predict images and the path of these images.
+        '''
         print("-------------------- [STATUS] Classifier prediction ------------------")
         # load the test set
         test_images = os.listdir(self._test_path)

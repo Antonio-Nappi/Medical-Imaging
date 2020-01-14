@@ -21,6 +21,13 @@ In particular:
 - the first 45 images have the mass
 - the others 60 images don't have the mass
 
+______________________________ A PRIORI INFORMATION________________________________
+- min_area = 107.0
+- average_area = 2468.1424332344213
+- max_area = 15065.0
+- min_perimeter = 42.627416491508484
+- average_perimeter = 203.78755433446221
+- max_perimeter = 683.0264718532562
 
 __________________________________ SVM PREDICTION__________________________________
 #label 1: MASS
