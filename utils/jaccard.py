@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 from utils.data_preprocessing import build_true_path
+import math
 
 ############################INNER FUNCTION##################################
 
@@ -17,40 +18,40 @@ def __jaccard_similarity(im_true, im_pred):
     intersection = np.logical_and(im_true, im_pred)
 
     union = np.logical_or(im_true, im_pred)
-
-    return intersection.sum() / float(union.sum())
+    return intersection.sum() / union.sum()
 
 #############################################################################
 
     
-def jaccard(ground_images, path_images):
+def jaccard(pred_ground_images, path_images, path_gound_test):
     '''
     The function computes the Jaccard indexes for all the predicted images.
     :param ground_images: the list of groundtruths of the predicted masses.
     :param path_images: the list of paths of the images.
-    :return: a tuple of different elements:
-        - jaccard_list: the list with all the Jaccard indexes;
-        - average: the average of all the Jaccard indexes.
+    :return: the list with all the Jaccard indexes;
     '''
     print("-------------------- [STATUS] Computing Jaccard index ----------------")
-    true_path = "dataset\groundtruth\ground_test"
-
-    somma = 0
     jaccard_list = []
-    for i in range(len(ground_images)):
-      
+
+    chek = []
+    for i in range(len(pred_ground_images)):
+        _type = path_images[i].split("_").pop(0)
         path = build_true_path(path_images[i])
 
-        true_img = cv.imread(true_path + "\\" + path, cv.IMREAD_ANYDEPTH)
-        true_img = cv.resize(true_img,(512, 512)) 
-           
-        img_true = np.asarray(true_img).astype(np.bool)
-        img_pred = np.asarray(ground_images[i]).astype(np.bool)
-        
-        jaccard = __jaccard_similarity(img_true, img_pred)
-        jaccard_list.append(jaccard)
-        somma = somma + jaccard
+        ground_test_img = cv.imread(path_gound_test + "\\" + path, cv.IMREAD_GRAYSCALE)
+        ground_test_img = cv.resize(ground_test_img,(512, 512))
 
-    average = somma/(i+1)
-    
-    return jaccard_list, average
+        ground_test_img = np.asarray(ground_test_img).astype(np.bool)
+        img_pred = cv.resize(pred_ground_images[i], (512, 512))
+        img_pred = np.asarray(img_pred).astype(np.bool)
+        
+        jaccard = __jaccard_similarity(ground_test_img, img_pred)
+
+        #check if the index is NaN (possible situation between a false positive and a groundtruth of a no-mass image)
+        if math.isnan(jaccard) and _type == "NOMASS":
+            jaccard = 1
+        if math.isnan(jaccard) and _type == "MASS":
+            jaccard = 0
+        jaccard_list.append(jaccard)
+
+    return jaccard_list

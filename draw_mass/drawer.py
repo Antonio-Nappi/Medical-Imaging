@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import random as rng
 from utils.utilities import extract_information
 from PIL import  Image
 
@@ -32,15 +31,10 @@ def __set_threshold(threshold_image, thr_value):
     :param thr_value: the empyrical threshold value.
     :return: the list of all the masses.
     '''
-    ret, thr_img = cv.threshold(threshold_image, thr_value, 255, 0, cv.THRESH_BINARY_INV)
+    ret, thr_img = cv.threshold(threshold_image, thr_value, 255, 0, cv.THRESH_BINARY)
     # Remove fat borders of the breast
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
     thr_img = cv.morphologyEx(thr_img, cv.MORPH_OPEN, kernel)
-    while (1):
-        cv.imshow("thres", thr_img)
-        key = cv.waitKey(1)
-        if key == 27:
-            break
     # Masses
     contours, _ = cv.findContours(thr_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     return contours
@@ -62,13 +56,7 @@ def my_draw_contours(segmeted_images, ground_path, paths):
     :param segmeted_images: the list of images to be segmented.
     :return: a tuple of list containing the segmented images and the relative groundtruths.
     '''
-    min_area, average_area, max_area, min_perimeter, average_perimeter, max_perimeter = extract_information(ground_path)
-    print(min_area)
-    print(average_area)
-    print(max_area)
-    print(min_perimeter)
-    print(average_perimeter)
-    print(max_perimeter)
+    min_area, max_area, min_perimeter, max_perimeter = extract_information(ground_path)
 
     print("-------------------- [STATUS] Drawing contours -----------------------")
     ground_images = []
@@ -85,7 +73,7 @@ def my_draw_contours(segmeted_images, ground_path, paths):
 
         drawing = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
         for i in range(len(contours)):
-            color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
+            color = (0, 0, 255)
             # Draw groundtruth
             cv.drawContours(img, contours, i, color, 2)
             # Draw masses on img
@@ -112,13 +100,10 @@ def clean_unet_images(input_unet_images, output_unet_images):
         mask = mask*255
         mask = mask.astype('uint8')
         # Erosion for removing U-Net noise
-        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (7, 7))
-        mask = cv.erode(mask, kernel, iterations=3)
+        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (9, 9))
+        mask = cv.erode(mask, kernel, iterations=4)
         # Creating the mask to clean the image
         ret, mask = cv.threshold(mask, 1, 255, 0, cv.THRESH_BINARY + cv.THRESH_OTSU)
-        # Force pixel into range [0; 255]
-        out = out * 255
-        out = out.astype('uint8')
         # Cleaning
         out[mask == 0] = 0
 

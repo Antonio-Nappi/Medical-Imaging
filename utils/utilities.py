@@ -19,7 +19,6 @@ def __find_information(image):
     list_perimeter = []
     sum_area = 0
     sum_perimeter = 0
-
     contours, _ = cv.findContours(image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     for i in range(len(contours)):
@@ -58,16 +57,13 @@ def extract_information(ground_path):
         list_areas.extend(area)
         list_perimeters.extend(perimeter)
 
-    average_area = sum_area_tot / len(list_areas)
-    average_perimeter = sum_perimeter_tot / len(list_perimeters)
-
     min_area = min(list_areas)
     min_perimeter = min(list_perimeters)
 
     max_area = max(list_areas)
     max_perimeter = max(list_perimeters)
 
-    return min_area, average_area, max_area, min_perimeter, average_perimeter, max_perimeter
+    return min_area, max_area, min_perimeter, max_perimeter
 
 def check_file():
     '''

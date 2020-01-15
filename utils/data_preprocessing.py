@@ -95,7 +95,6 @@ def cropping(mask_path, mass_images, path_predicted_mass):
         cropped_images.append(img_cropped)
 
         # Saving images
-        #pil_img = Image.fromarray(img_cropped)  # convert to PIL Image
         print("Saving image n.", i+1)
         print("------------------------------")
         img_cropped.save("dataset\\unet_input\\" + path_predicted_mass[i])
