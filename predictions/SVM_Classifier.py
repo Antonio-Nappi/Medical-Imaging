@@ -19,7 +19,7 @@ class SVM_Classifier:
         self._ground_path = ground_path
         self._test_path = test_path
         #Inizialization of the SVM classifier
-        self._my_svm = skl.SVC(C=1000000000, kernel='rbf', gamma='auto', verbose=True, max_iter=-1)
+        self._my_svm = skl.SVC(C=100, kernel='rbf', gamma='auto', verbose=False, max_iter=-1)
         self._nomass_images = os.listdir(nomass_path)
         # load the overlay dataset
         self._overlay_images = os.listdir(overlay_path)
@@ -70,8 +70,12 @@ class SVM_Classifier:
 
     def labelling(self, labelling=False):
         '''
-        The function checks if the dataset preprocessing has been executed.
-        :param labelling: the boolean condition: if True the data preprocessing must be executed.
+        The function computes the dataset preprocessing step:
+            - remove irrelevant brackground from all the images;
+            - divide images into classes (mass / no-mass);
+            - balance data for the classifier;
+            - augumentation of the dataset for better accuracy.
+        :param labelling: the boolean condition: if True the dataset preprocessing must be executed.
         '''
         if(labelling):
             dsp.cleaning(self._mask_path, self._mask_images, self._nomass_path, self._nomass_images)

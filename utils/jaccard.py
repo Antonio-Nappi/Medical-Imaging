@@ -26,14 +26,14 @@ def __jaccard_similarity(im_true, im_pred):
 def jaccard(pred_ground_images, path_images, path_gound_test):
     '''
     The function computes the Jaccard indexes for all the predicted images.
-    :param ground_images: the list of groundtruths of the predicted masses.
+    :param path_ground_images: the list of groundtruths of the predicted masses.
     :param path_images: the list of paths of the images.
     :return: the list with all the Jaccard indexes;
     '''
     print("-------------------- [STATUS] Computing Jaccard index ----------------")
     jaccard_list = []
 
-    chek = []
+
     for i in range(len(pred_ground_images)):
         _type = path_images[i].split("_").pop(0)
         path = build_true_path(path_images[i])

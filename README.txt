@@ -46,3 +46,10 @@ False-negatives: 15 - images with no mass that have been classified as mass
 __________________________________ U-NET PREDICTION__________________________________
 Test loss: 0.7297657
 Test accuracy: 0.8267117
+
+__________________________________ JACCARD INDEXES____________________________________
+Average Jaccard index:  0.3975116977331322
+--------------------------------
+Minimum Jaccard index:  0.0
+--------------------------------
+Maximum Jaccard index:  1

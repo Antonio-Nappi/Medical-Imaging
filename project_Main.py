@@ -3,6 +3,8 @@ from utils.jaccard import jaccard
 from predictions.SVM_Classifier import SVM_Classifier
 from predictions.UNet import UNet
 from draw_mass import drawer
+import os
+import cv2 as cv
 
 ############################ PATH DEFINITION ############################
 nomass_path = "dataset/images/nomass"
@@ -45,5 +47,3 @@ print("--------------------------------")
 print("Minimum Jaccard index: ", minimum)
 print("--------------------------------")
 print("Maximum Jaccard index: ", maximum)
-
-

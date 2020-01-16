@@ -49,14 +49,20 @@ def __saving_results(outcomes, ground_truths, paths):
 
 #############################################################################################
 
-def my_draw_contours(segmeted_images, ground_path, paths):
+def my_draw_contours(segmeted_images, ground_path, paths, const_area=2000, const_perimeter=500):
     '''
     The function extract the masses on the current mammogram image and draw them on the original
     image.
     :param segmeted_images: the list of images to be segmented.
+    :param ground_path: the list of groundtruth paths.
+    :param paths: the list of images path to be segmented.
+    :param const_area: constant factor scale for areas.
+    :param const_perimeter: constant factor scale for perimeters.
     :return: a tuple of list containing the segmented images and the relative groundtruths.
     '''
     min_area, max_area, min_perimeter, max_perimeter = extract_information(ground_path)
+    max_area = max_area + const_area
+    max_perimeter = max_perimeter + const_perimeter
 
     print("-------------------- [STATUS] Drawing contours -----------------------")
     ground_images = []
@@ -65,13 +71,13 @@ def my_draw_contours(segmeted_images, ground_path, paths):
         # Threshold: 122 is an empirical value
         contours = __set_threshold(img, 122)
         # Checks value below 122. Threshold: 105 is another empirical value.
-        contours = __check_masses(contours, min_area, min_perimeter, max_area+2000, max_perimeter+200)
+        contours = __check_masses(contours, min_area, min_perimeter, max_area, max_perimeter)
 
         if len(contours) == 0:
             contours = __set_threshold(img, 105)
-            contours = __check_masses(contours, min_area, min_perimeter, max_area+2000, max_perimeter+200)
+            contours = __check_masses(contours, min_area, min_perimeter, max_area, max_perimeter)
 
-        drawing = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+        drawing = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)
         for i in range(len(contours)):
             color = (0, 0, 255)
             # Draw groundtruth
@@ -101,7 +107,7 @@ def clean_unet_images(input_unet_images, output_unet_images):
         mask = mask.astype('uint8')
         # Erosion for removing U-Net noise
         kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (9, 9))
-        mask = cv.erode(mask, kernel, iterations=4)
+        mask = cv.erode(mask, kernel, iterations=5)
         # Creating the mask to clean the image
         ret, mask = cv.threshold(mask, 1, 255, 0, cv.THRESH_BINARY + cv.THRESH_OTSU)
         # Cleaning
